@@ -3,10 +3,11 @@ import { ArrowRight } from "lucide-react"
 interface FormProps {
   action?: (data: FormData) => void
   input: string
+  name: string
   button: string
 }
 
-export function Form({ action, input, button }: FormProps) {
+export function Form({ action, input, name, button }: FormProps) {
 
   return (
     <form
@@ -15,7 +16,7 @@ export function Form({ action, input, button }: FormProps) {
       <input
         className="flex-1 text-sm bg-transparent mx-2 outline-none placeholder:text-zinc-500 text-zinc-100"
         type="text"
-        name="theme"
+        name={name}
         placeholder={input}
         autoComplete="off"
       />

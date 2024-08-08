@@ -1,18 +1,48 @@
 import { ArrowUp } from "lucide-react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { addMessageReaction } from "../../../http/add-message-reaction";
+import { toast } from "sonner";
+import { removeMessageReaction } from "../../../http/remove-message-reaction";
 
 interface MessageProps {
+  messageId: string
   text: string
   ammountOfReactions: number
   answered?: boolean
 }
 
-export function Message({ text, ammountOfReactions, answered = false }: MessageProps) {
+export function Message({ messageId, text, ammountOfReactions, answered = false }: MessageProps) {
 
+  const { roomId } = useParams()
   const [isReacted, setIsReacted] = useState(false)
 
-  function handleReactToMessage() {
-    setIsReacted(true)
+  async function handleReactToMessage() {
+    if (!roomId) return
+
+    if (!isReacted) {
+      try {
+        await addMessageReaction({ roomId, messageId })
+        setIsReacted(true)
+        toast.success("Você reagiu a esta pergunta")
+        return
+      } catch (error) {
+        console.error("error updating reaction", error)
+        toast.error("Ocorreu um erro ao reagir a pergunta")
+      }
+    }
+
+    if (isReacted) {
+      try {
+        await removeMessageReaction({ roomId, messageId })
+        setIsReacted(false)
+        toast.success("Você reagiu esta pergunta")
+        return
+      } catch (error) {
+        console.error("error updating reaction", error)
+        toast.error("Ocorreu um erro ao reagir a pergunta")
+      }
+    }
   }
 
   return (
@@ -27,6 +57,7 @@ export function Message({ text, ammountOfReactions, answered = false }: MessageP
         isReacted
           ? (
             <button
+              onClick={handleReactToMessage}
               className="mt-3 flex items-center gap-2 text-orange-400 hover:text-orange-500 text-sm font-medium"
               type="button">
               <ArrowUp className="size-4" />

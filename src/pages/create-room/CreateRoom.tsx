@@ -1,15 +1,27 @@
 import logo from "../../assets/Logo.svg"
 import { useNavigate } from "react-router-dom"
 import { Form } from "../../components/global/Form"
+import { createRoom } from "../../http/create-room"
+import { toast } from "sonner"
 
 export function CreateRoom() {
 
   const navigate = useNavigate()
 
-  function handleCreateRoom(data: FormData) {
+  async function handleCreateRoom(data: FormData) {
     const theme = data.get("theme")?.toString()
-    navigate("/room/roomId")
-    console.log(theme)
+
+    if (!theme) return
+
+    try {
+      const { roomId } = await createRoom({ theme })
+      navigate(`/room/${roomId}`)
+
+    } catch (error) {
+      toast.error("Falha ao criar sala")
+      console.error("error creating room", error)
+    }
+
   }
 
   return (
@@ -22,7 +34,7 @@ export function CreateRoom() {
           Crie uma sala pública de AMA (Ask me anything) e priorize as perguntas mais importantes para a comunidade.
         </p>
 
-        <Form action={handleCreateRoom} input="Nome da Sala" button="Criar Sala" />
+        <Form action={handleCreateRoom} input="Nome da Sala" name="theme" button="Criar Sala" />
 
       </div>
     </main>
