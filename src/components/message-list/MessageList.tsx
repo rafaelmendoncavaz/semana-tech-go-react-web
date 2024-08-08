@@ -26,7 +26,15 @@ export function MessageList() {
   return (
     <ol className="list-decimal list-outside px-3 space-y-8">
       {
-        sortMessagesByLikes.map(item => <Message key={item.id} messageId={item.id} text={item.text} ammountOfReactions={item.ammountOfReactions} />)
+        sortMessagesByLikes.map(item => (
+          <Message
+            key={item.id}
+            messageId={item.id}
+            text={item.text}
+            ammountOfReactions={item.ammountOfReactions}
+            answered={item.answered}
+          />)
+        )
       }
     </ol>
   )

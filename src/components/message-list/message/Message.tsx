@@ -1,9 +1,12 @@
-import { ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { addMessageReaction } from "../../../http/add-message-reaction";
 import { toast } from "sonner";
 import { removeMessageReaction } from "../../../http/remove-message-reaction";
+import { markMessageAsAnswered } from "../../../http/mark-as-answered";
+import { LikeButton } from "../../global/LikeButton";
+import { DislikeButton } from "../../global/DislikeButton";
+import { MarkAsAnsweredButton } from "../../global/MarkAsAnsweredButton";
 
 interface MessageProps {
   messageId: string
@@ -45,6 +48,18 @@ export function Message({ messageId, text, ammountOfReactions, answered = false 
     }
   }
 
+  async function handleMarkAsAnswered() {
+    if (!roomId) return
+
+    try {
+      await markMessageAsAnswered({ roomId, messageId })
+      toast.success("Mensagem marcada como lida")
+    } catch (error) {
+      console.error("error marking message as read", error)
+      toast.error("Ocorreu um erro ao marcar a mensagem como lida")
+    }
+  }
+
   return (
     <li
       data-answered={answered}
@@ -56,22 +71,32 @@ export function Message({ messageId, text, ammountOfReactions, answered = false 
       {
         isReacted
           ? (
-            <button
-              onClick={handleReactToMessage}
-              className="mt-3 flex items-center gap-2 text-orange-400 hover:text-orange-500 text-sm font-medium"
-              type="button">
-              <ArrowUp className="size-4" />
-              Curtir pergunta ({ammountOfReactions})
-            </button>
+            <div className="flex items-center justify-between">
+              <LikeButton handleReactToMessage={handleReactToMessage} ammountOfReactions={ammountOfReactions} />
+              {
+                answered
+                  ? (
+                    <MarkAsAnsweredButton handleMarkAsAnswered={handleMarkAsAnswered} text="Respondida" />
+                  )
+                  : (
+                    <MarkAsAnsweredButton handleMarkAsAnswered={handleMarkAsAnswered} text="Marcar Como Respondida" />
+                  )
+              }
+            </div>
           )
           : (
-            <button
-              onClick={handleReactToMessage}
-              className="mt-3 flex items-center gap-2 text-zinc-400 hover:text-zinc-300 text-sm font-medium"
-              type="button">
-              <ArrowUp className="size-4" />
-              Curtir pergunta ({ammountOfReactions})
-            </button>
+            <div className="flex items-center justify-between">
+              <DislikeButton handleReactToMessage={handleReactToMessage} ammountOfReactions={ammountOfReactions} />
+              {
+                answered
+                  ? (
+                    <MarkAsAnsweredButton handleMarkAsAnswered={handleMarkAsAnswered} text="Respondida" />
+                  )
+                  : (
+                    <MarkAsAnsweredButton handleMarkAsAnswered={handleMarkAsAnswered} text="Marcar Como Respondida" />
+                  )
+              }
+            </div>
           )
       }
     </li>
